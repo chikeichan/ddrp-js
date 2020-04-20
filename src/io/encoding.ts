@@ -9,6 +9,13 @@ export function encodeUint8 (w: Writer, n: number, cb: IOCallback): void {
   w.write(Buffer.from([n]), cb);
 }
 
+export function encodeUint8Sync (n: number): Buffer {
+  if (n < 0 || n > 255) {
+    throw new Error('number is not a uint8');
+  }
+  return Buffer.from([n]);
+}
+
 export function encodeUint64 (w: Writer, n: number, cb: IOCallback): void {
   if (n < 0) {
     throw new Error('number is not a uint64');
@@ -21,6 +28,15 @@ export function encodeUint64 (w: Writer, n: number, cb: IOCallback): void {
     Buffer.alloc(4),
     numBytes,
   );
+}
+
+export function encodeUint64Sync (n: number): Buffer {
+  const numBytes = Buffer.alloc(4);
+  numBytes.writeUInt32BE(n, 0);
+  return Buffer.concat([
+    Buffer.alloc(4),
+    numBytes,
+  ]);
 }
 
 export function encodeUvarint (w: Writer, n: number, cb: IOCallback): void {
@@ -69,6 +85,10 @@ export function encodeStringSync (str: string): Buffer {
 
 export function encodeTimestamp (w: Writer, date: Date, cb: IOCallback): void {
   encodeUint64(w, date.getTime() / 1000, cb);
+}
+
+export function encodeTimestampSync (date: Date): Buffer {
+  return encodeUint64Sync(date.getTime() / 1000);
 }
 
 export function encodeArray<T> (w: Writer, itemWriter: (item: T, cb: IOCallback) => void, items: T[], cb: IOCallback): void {

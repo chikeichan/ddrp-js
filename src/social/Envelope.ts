@@ -70,27 +70,36 @@ export function encodeEnvelope (w: Writer, envelope: Envelope, cb: IOCallback) {
     (cb) => encodeUint8(buf, envelope.nameIndex, cb),
     (cb) => encodeTimestamp(buf, envelope.timestamp, cb),
     (cb) => encodeFixedBytes(buf, guidBuf, cb),
-    (cb) => {
-      switch (envelope.message.type.toString('hex')) {
-        case Post.TYPE.toString('hex'):
-          encodePost(buf, envelope.message as Post, cb);
-          break;
-        case Connection.TYPE.toString('hex'):
-          encodeConnection(buf, envelope.message as Connection, cb);
-          break;
-        case Moderation.TYPE.toString('hex'):
-          encodeModeration(buf, envelope.message as Moderation, cb);
-          break;
-        default:
-          if (!(envelope.message instanceof Unknown)) {
-            return cb(new Error('expected an unknown message'), 0);
-          }
-          encodeUnknown(buf, envelope.message as Unknown, cb);
-          break;
-      }
-    },
+    (cb) => encodeEnvelopeMessage(buf, envelope, cb),
     (cb) => encodeFixedBytes(buf, envelope.additionalData || ZERO_BUFFER, cb),
   );
+}
+
+/**
+ * Encodes a [[Message]] contained within an [[Envelope]].
+ *
+ * @param w
+ * @param envelope
+ * @param cb
+ */
+export function encodeEnvelopeMessage (w: Writer, envelope: Envelope, cb: IOCallback) {
+  switch (envelope.message.type.toString('hex')) {
+    case Post.TYPE.toString('hex'):
+      encodePost(w, envelope.message as Post, cb);
+      break;
+    case Connection.TYPE.toString('hex'):
+      encodeConnection(w, envelope.message as Connection, cb);
+      break;
+    case Moderation.TYPE.toString('hex'):
+      encodeModeration(w, envelope.message as Moderation, cb);
+      break;
+    default:
+      if (!(envelope.message instanceof Unknown)) {
+        return cb(new Error('expected an unknown message'), 0);
+      }
+      encodeUnknown(w, envelope.message as Unknown, cb);
+      break;
+  }
 }
 
 /**
