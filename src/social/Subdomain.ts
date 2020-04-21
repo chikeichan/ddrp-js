@@ -3,6 +3,10 @@ import {chain, chainIO} from '../io/util';
 import {decodeFixedBytes, decodeUint8} from '../io/decoding';
 import {encodeFixedBytes, encodeUint8} from '../io/encoding';
 
+export const SUBDOMAIN_MAGIC = 'SUB';
+
+export const SUBDOMAIN_RECORD_LEN = 50;
+
 export interface Subdomain {
   name: string
   index: number
