@@ -47,7 +47,7 @@ export function iterateAllEnvelopes (r: Reader, cb: (err: any, envelope: Envelop
       return cb(err, null);
     }
     if (envelope === null) {
-      doIterate();
+      setImmediate(doIterate);
       return;
     }
     if (cb(null, envelope!)) {
