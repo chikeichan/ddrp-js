@@ -2,7 +2,22 @@
 // file: api.proto
 
 import * as jspb from "google-protobuf";
-import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
+
+export class Empty extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Empty.AsObject;
+  static toObject(includeInstance: boolean, msg: Empty): Empty.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: Empty, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Empty;
+  static deserializeBinaryFromReader(message: Empty, reader: jspb.BinaryReader): Empty;
+}
+
+export namespace Empty {
+  export type AsObject = {
+  }
+}
 
 export class GetStatusRes extends jspb.Message {
   getPeerid(): Uint8Array | string;
@@ -13,11 +28,14 @@ export class GetStatusRes extends jspb.Message {
   getPeercount(): number;
   setPeercount(value: number): void;
 
-  getBytestx(): number;
-  setBytestx(value: number): void;
+  getHeadercount(): number;
+  setHeadercount(value: number): void;
 
-  getBytesrx(): number;
-  setBytesrx(value: number): void;
+  getTxbytes(): number;
+  setTxbytes(value: number): void;
+
+  getRxbytes(): number;
+  setRxbytes(value: number): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetStatusRes.AsObject;
@@ -33,30 +51,9 @@ export namespace GetStatusRes {
   export type AsObject = {
     peerid: Uint8Array | string,
     peercount: number,
-    bytestx: number,
-    bytesrx: number,
-  }
-}
-
-export class GetConfigRes extends jspb.Message {
-  getValue(): Uint8Array | string;
-  getValue_asU8(): Uint8Array;
-  getValue_asB64(): string;
-  setValue(value: Uint8Array | string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GetConfigRes.AsObject;
-  static toObject(includeInstance: boolean, msg: GetConfigRes): GetConfigRes.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: GetConfigRes, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GetConfigRes;
-  static deserializeBinaryFromReader(message: GetConfigRes, reader: jspb.BinaryReader): GetConfigRes;
-}
-
-export namespace GetConfigRes {
-  export type AsObject = {
-    value: Uint8Array | string,
+    headercount: number,
+    txbytes: number,
+    rxbytes: number,
   }
 }
 
@@ -116,8 +113,11 @@ export class AddPeerReq extends jspb.Message {
   getPeerid_asB64(): string;
   setPeerid(value: Uint8Array | string): void;
 
-  getAddr(): string;
-  setAddr(value: string): void;
+  getIp(): string;
+  setIp(value: string): void;
+
+  getVerifypeerid(): boolean;
+  setVerifypeerid(value: boolean): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AddPeerReq.AsObject;
@@ -132,37 +132,14 @@ export class AddPeerReq extends jspb.Message {
 export namespace AddPeerReq {
   export type AsObject = {
     peerid: Uint8Array | string,
-    addr: string,
-  }
-}
-
-export class UnbanPeerReq extends jspb.Message {
-  getIp(): Uint8Array | string;
-  getIp_asU8(): Uint8Array;
-  getIp_asB64(): string;
-  setIp(value: Uint8Array | string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): UnbanPeerReq.AsObject;
-  static toObject(includeInstance: boolean, msg: UnbanPeerReq): UnbanPeerReq.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: UnbanPeerReq, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): UnbanPeerReq;
-  static deserializeBinaryFromReader(message: UnbanPeerReq, reader: jspb.BinaryReader): UnbanPeerReq;
-}
-
-export namespace UnbanPeerReq {
-  export type AsObject = {
-    ip: Uint8Array | string,
+    ip: string,
+    verifypeerid: boolean,
   }
 }
 
 export class BanPeerReq extends jspb.Message {
-  getIp(): Uint8Array | string;
-  getIp_asU8(): Uint8Array;
-  getIp_asB64(): string;
-  setIp(value: Uint8Array | string): void;
+  getIp(): string;
+  setIp(value: string): void;
 
   getDurationms(): number;
   setDurationms(value: number): void;
@@ -179,93 +156,87 @@ export class BanPeerReq extends jspb.Message {
 
 export namespace BanPeerReq {
   export type AsObject = {
-    ip: Uint8Array | string,
+    ip: string,
     durationms: number,
   }
 }
 
-export class QueryPeersReq extends jspb.Message {
-  getIncludeconnected(): boolean;
-  setIncludeconnected(value: boolean): void;
-
-  getIncludestored(): boolean;
-  setIncludestored(value: boolean): void;
-
-  getIncludebanned(): boolean;
-  setIncludebanned(value: boolean): void;
+export class UnbanPeerReq extends jspb.Message {
+  getIp(): string;
+  setIp(value: string): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): QueryPeersReq.AsObject;
-  static toObject(includeInstance: boolean, msg: QueryPeersReq): QueryPeersReq.AsObject;
+  toObject(includeInstance?: boolean): UnbanPeerReq.AsObject;
+  static toObject(includeInstance: boolean, msg: UnbanPeerReq): UnbanPeerReq.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: QueryPeersReq, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): QueryPeersReq;
-  static deserializeBinaryFromReader(message: QueryPeersReq, reader: jspb.BinaryReader): QueryPeersReq;
+  static serializeBinaryToWriter(message: UnbanPeerReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UnbanPeerReq;
+  static deserializeBinaryFromReader(message: UnbanPeerReq, reader: jspb.BinaryReader): UnbanPeerReq;
 }
 
-export namespace QueryPeersReq {
+export namespace UnbanPeerReq {
   export type AsObject = {
-    includeconnected: boolean,
-    includestored: boolean,
-    includebanned: boolean,
+    ip: string,
   }
 }
 
-export class QueryPeersRes extends jspb.Message {
+export class ListPeersReq extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListPeersReq.AsObject;
+  static toObject(includeInstance: boolean, msg: ListPeersReq): ListPeersReq.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ListPeersReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListPeersReq;
+  static deserializeBinaryFromReader(message: ListPeersReq, reader: jspb.BinaryReader): ListPeersReq;
+}
+
+export namespace ListPeersReq {
+  export type AsObject = {
+  }
+}
+
+export class ListPeersRes extends jspb.Message {
   getPeerid(): Uint8Array | string;
   getPeerid_asU8(): Uint8Array;
   getPeerid_asB64(): string;
   setPeerid(value: Uint8Array | string): void;
 
-  getIp(): Uint8Array | string;
-  getIp_asU8(): Uint8Array;
-  getIp_asB64(): string;
-  setIp(value: Uint8Array | string): void;
-
-  getPort(): number;
-  setPort(value: number): void;
-
-  getState(): QueryPeersRes.PeerStateMap[keyof QueryPeersRes.PeerStateMap];
-  setState(value: QueryPeersRes.PeerStateMap[keyof QueryPeersRes.PeerStateMap]): void;
+  getIp(): string;
+  setIp(value: string): void;
 
   getBanned(): boolean;
   setBanned(value: boolean): void;
 
-  getRecvbytes(): number;
-  setRecvbytes(value: number): void;
+  getConnected(): boolean;
+  setConnected(value: boolean): void;
 
-  getSentbytes(): number;
-  setSentbytes(value: number): void;
+  getTxbytes(): number;
+  setTxbytes(value: number): void;
+
+  getRxbytes(): number;
+  setRxbytes(value: number): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): QueryPeersRes.AsObject;
-  static toObject(includeInstance: boolean, msg: QueryPeersRes): QueryPeersRes.AsObject;
+  toObject(includeInstance?: boolean): ListPeersRes.AsObject;
+  static toObject(includeInstance: boolean, msg: ListPeersRes): ListPeersRes.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: QueryPeersRes, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): QueryPeersRes;
-  static deserializeBinaryFromReader(message: QueryPeersRes, reader: jspb.BinaryReader): QueryPeersRes;
+  static serializeBinaryToWriter(message: ListPeersRes, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListPeersRes;
+  static deserializeBinaryFromReader(message: ListPeersRes, reader: jspb.BinaryReader): ListPeersRes;
 }
 
-export namespace QueryPeersRes {
+export namespace ListPeersRes {
   export type AsObject = {
     peerid: Uint8Array | string,
-    ip: Uint8Array | string,
-    port: number,
-    state: QueryPeersRes.PeerStateMap[keyof QueryPeersRes.PeerStateMap],
+    ip: string,
     banned: boolean,
-    recvbytes: number,
-    sentbytes: number,
+    connected: boolean,
+    txbytes: number,
+    rxbytes: number,
   }
-
-  export interface PeerStateMap {
-    CONNECTED: 0;
-    STORED: 1;
-    BANNED: 2;
-  }
-
-  export const PeerState: PeerStateMap;
 }
 
 export class CheckoutReq extends jspb.Message {
@@ -466,48 +437,6 @@ export namespace CommitRes {
   }
 }
 
-export class ReadReq extends jspb.Message {
-  getName(): string;
-  setName(value: string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): ReadReq.AsObject;
-  static toObject(includeInstance: boolean, msg: ReadReq): ReadReq.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: ReadReq, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): ReadReq;
-  static deserializeBinaryFromReader(message: ReadReq, reader: jspb.BinaryReader): ReadReq;
-}
-
-export namespace ReadReq {
-  export type AsObject = {
-    name: string,
-  }
-}
-
-export class ReadRes extends jspb.Message {
-  getData(): Uint8Array | string;
-  getData_asU8(): Uint8Array;
-  getData_asB64(): string;
-  setData(value: Uint8Array | string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): ReadRes.AsObject;
-  static toObject(includeInstance: boolean, msg: ReadRes): ReadRes.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: ReadRes, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): ReadRes;
-  static deserializeBinaryFromReader(message: ReadRes, reader: jspb.BinaryReader): ReadRes;
-}
-
-export namespace ReadRes {
-  export type AsObject = {
-    data: Uint8Array | string,
-  }
-}
-
 export class ReadAtReq extends jspb.Message {
   getName(): string;
   setName(value: string): void;
@@ -537,6 +466,9 @@ export namespace ReadAtReq {
 }
 
 export class ReadAtRes extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
   getData(): Uint8Array | string;
   getData_asU8(): Uint8Array;
   getData_asB64(): string;
@@ -554,6 +486,7 @@ export class ReadAtRes extends jspb.Message {
 
 export namespace ReadAtRes {
   export type AsObject = {
+    offset: number,
     data: Uint8Array | string,
   }
 }
@@ -578,6 +511,26 @@ export namespace BlobInfoReq {
   }
 }
 
+export class ListBlobInfoReq extends jspb.Message {
+  getStart(): string;
+  setStart(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListBlobInfoReq.AsObject;
+  static toObject(includeInstance: boolean, msg: ListBlobInfoReq): ListBlobInfoReq.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ListBlobInfoReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListBlobInfoReq;
+  static deserializeBinaryFromReader(message: ListBlobInfoReq, reader: jspb.BinaryReader): ListBlobInfoReq;
+}
+
+export namespace ListBlobInfoReq {
+  export type AsObject = {
+    start: string,
+  }
+}
+
 export class BlobInfoRes extends jspb.Message {
   getName(): string;
   setName(value: string): void;
@@ -589,9 +542,6 @@ export class BlobInfoRes extends jspb.Message {
 
   getImportheight(): number;
   setImportheight(value: number): void;
-
-  getHasblob(): boolean;
-  setHasblob(value: boolean): void;
 
   getTimestamp(): number;
   setTimestamp(value: number): void;
@@ -614,6 +564,9 @@ export class BlobInfoRes extends jspb.Message {
   getSignature_asB64(): string;
   setSignature(value: Uint8Array | string): void;
 
+  getTimebank(): number;
+  setTimebank(value: number): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): BlobInfoRes.AsObject;
   static toObject(includeInstance: boolean, msg: BlobInfoRes): BlobInfoRes.AsObject;
@@ -629,32 +582,12 @@ export namespace BlobInfoRes {
     name: string,
     publickey: Uint8Array | string,
     importheight: number,
-    hasblob: boolean,
     timestamp: number,
     merkleroot: Uint8Array | string,
     reservedroot: Uint8Array | string,
     receivedat: number,
     signature: Uint8Array | string,
-  }
-}
-
-export class ListBlobInfoReq extends jspb.Message {
-  getStart(): string;
-  setStart(value: string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): ListBlobInfoReq.AsObject;
-  static toObject(includeInstance: boolean, msg: ListBlobInfoReq): ListBlobInfoReq.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: ListBlobInfoReq, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): ListBlobInfoReq;
-  static deserializeBinaryFromReader(message: ListBlobInfoReq, reader: jspb.BinaryReader): ListBlobInfoReq;
-}
-
-export namespace ListBlobInfoReq {
-  export type AsObject = {
-    start: string,
+    timebank: number,
   }
 }
 
@@ -695,26 +628,6 @@ export class SendUpdateRes extends jspb.Message {
 export namespace SendUpdateRes {
   export type AsObject = {
     recipientcount: number,
-  }
-}
-
-export class CountHeadersRes extends jspb.Message {
-  getCount(): number;
-  setCount(value: number): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): CountHeadersRes.AsObject;
-  static toObject(includeInstance: boolean, msg: CountHeadersRes): CountHeadersRes.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: CountHeadersRes, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): CountHeadersRes;
-  static deserializeBinaryFromReader(message: CountHeadersRes, reader: jspb.BinaryReader): CountHeadersRes;
-}
-
-export namespace CountHeadersRes {
-  export type AsObject = {
-    count: number,
   }
 }
 

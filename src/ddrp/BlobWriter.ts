@@ -1,4 +1,4 @@
-import {WriteReq} from './proto/api_pb';
+import {WriteReq} from './proto/v1/api_pb';
 import * as grpc from 'grpc';
 import {IOCallback, Writer} from '../io/types';
 

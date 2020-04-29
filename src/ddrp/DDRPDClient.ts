@@ -1,4 +1,4 @@
-import {DDRPClient as RPCClient} from './proto/api_grpc_pb';
+import {DDRPv1Client} from './proto/v1/api_grpc_pb';
 import * as grpc from 'grpc';
 import {
   AddPeerReq,
@@ -7,25 +7,26 @@ import {
   BlobInfoRes,
   CheckoutReq,
   CommitReq,
+  Empty,
   ListBlobInfoReq,
+  ListPeersReq,
+  ListPeersRes,
   PreCommitReq,
-  QueryPeersReq,
-  QueryPeersRes,
   ReadAtReq,
   SendUpdateReq,
   TruncateReq,
   UnbanPeerReq,
   WriteReq
-} from './proto/api_pb';
+} from './proto/v1/api_pb';
 import {Peer} from './Peer';
 import {BlobInfo} from './BlobInfo';
-import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
+import {Status} from './Status';
 
 /**
  * The base gRPC client used to interact with DDRPD nodes.
  */
 export default class DDRPDClient {
-  private readonly client: RPCClient;
+  private readonly client: DDRPv1Client;
 
   /**
    * Constructs a new client.
@@ -34,32 +35,37 @@ export default class DDRPDClient {
    * @param credentials - Unused at this time.
    */
   constructor (url: string, credentials = grpc.credentials.createInsecure()) {
-    this.client = new RPCClient(url, credentials);
+    this.client = new DDRPv1Client(url, credentials);
   }
 
-  /**
-   * Send Update
-   */
-  sendUpdate (name: string): Promise<void> {
-    const req = new SendUpdateReq();
-    req.setName(name);
-
-    return new Promise((resolve, reject) => this.client.sendUpdate(req, (err) => {
+  getStatus (): Promise<Status> {
+    const req = new Empty();
+    return new Promise((resolve, reject) => this.client.getStatus(req, (err, res) => {
       if (err) {
         return reject(err);
       }
+      if (!res) {
+        return reject(new Error('res is undefined'));
+      }
 
-      resolve();
+      return {
+        peerId: Buffer.from(res.getPeerid_asU8()).toString('hex'),
+        peerCount: res.getPeercount(),
+        headerCount: res.getHeadercount(),
+        txBytes: res.getTxbytes(),
+        rxBytes: res.getRxbytes(),
+      };
     }));
   }
 
   /**
    * Connects to a peer.
    */
-  addPeer (peerId: Buffer, ip: string, port: number): Promise<void> {
+  addPeer (ip: string, peerId: Buffer = Buffer.alloc(0), verify: boolean = false): Promise<void> {
     const req = new AddPeerReq();
-    req.setAddr(`${ip}:${port}`);
+    req.setIp(ip);
     req.setPeerid(peerId);
+    req.setVerifypeerid(verify);
 
     return new Promise((resolve, reject) => this.client.addPeer(req, (err) => {
       if (err) {
@@ -68,33 +74,6 @@ export default class DDRPDClient {
 
       resolve();
     }));
-  }
-
-  /**
-   * Returns the DDRPD node's list of connected peers.
-   */
-  getPeers (includeConnected = true, includeStored = false, includeBanned = false): Promise<Peer[]> {
-    const req = new QueryPeersReq();
-    req.setIncludeconnected(includeConnected);
-    req.setIncludestored(includeStored);
-    req.setIncludebanned(includeBanned);
-    const stream = this.client.queryPeers(req);
-
-    return new Promise((resolve, reject) => {
-      const out: Peer[] = [];
-
-      stream.on('data', (peer: QueryPeersRes) => out.push({
-        peerId: Buffer.from(peer.getPeerid_asU8()).toString('hex'),
-        ip: this.decodeIP(peer.getIp_asU8()),
-        port: peer.getPort(),
-        isBanned: peer.getBanned(),
-        sentBytes: peer.getSentbytes(),
-        receivedBytes: peer.getRecvbytes(),
-      }));
-
-      stream.on('error', (err) => reject(err));
-      stream.on('end', () => resolve(out));
-    });
   }
 
   /**
@@ -130,30 +109,28 @@ export default class DDRPDClient {
     }));
   }
 
-  readAt (name: string, offset: number, len: number): Promise<Buffer> {
-    const req = new ReadAtReq();
-    req.setName(name);
-    req.setOffset(offset);
-    req.setLen(len);
-
-    return new Promise((resolve, reject) => this.client.readAt(req, (err, res) => {
-      if (err) {
-        return reject(err);
-      }
-
-      resolve(Buffer.from(res!.getData_asU8()));
-    }));
-  }
-
   /**
-   * Opens a write stream suitable for writing DDRP blobs.
-   *
-   * You'll probably want to wrap this in a [[BlobWriter]].
-   * Note that writing to blobs requires them to be checked out
-   * using the [[checkout]] method below.
+   * Returns the DDRPD node's list of connected peers.
    */
-  createWriteStream (): grpc.ClientWritableStream<WriteReq> {
-    return this.client.write(() => ({}));
+  listPeers (): Promise<Peer[]> {
+    const req = new ListPeersReq();
+    const stream = this.client.listPeers(req);
+
+    return new Promise((resolve, reject) => {
+      const out: Peer[] = [];
+
+      stream.on('data', (peer: ListPeersRes) => out.push({
+        peerId: Buffer.from(peer.getPeerid_asU8()).toString('hex'),
+        ip: peer.getIp(),
+        isBanned: peer.getBanned(),
+        isConnected: peer.getConnected(),
+        txBytes: peer.getTxbytes(),
+        rxBytes: peer.getRxbytes(),
+      }));
+
+      stream.on('error', (err) => reject(err));
+      stream.on('end', () => resolve(out));
+    });
   }
 
   /**
@@ -172,6 +149,17 @@ export default class DDRPDClient {
 
       resolve(res!.getTxid());
     }));
+  }
+
+  /**
+   * Opens a write stream suitable for writing DDRP blobs.
+   *
+   * You'll probably want to wrap this in a [[BlobWriter]].
+   * Note that writing to blobs requires them to be checked out
+   * using the [[checkout]] method below.
+   */
+  createWriteStream (): grpc.ClientWritableStream<WriteReq> {
+    return this.client.write(() => ({}));
   }
 
   /**
@@ -233,6 +221,29 @@ export default class DDRPDClient {
   }
 
   /**
+   * Reads len data from a blob at the given offset. You will likely want to use
+   * [[BlobReader]] rather than this method directly.
+   *
+   * @param name - The blob's name.
+   * @param offset - The offset to start reading from.
+   * @param len - The length of the data to read.
+   */
+  readAt (name: string, offset: number, len: number): Promise<Buffer> {
+    const req = new ReadAtReq();
+    req.setName(name);
+    req.setOffset(offset);
+    req.setLen(len);
+
+    return new Promise((resolve, reject) => this.client.readAt(req, (err, res) => {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve(Buffer.from(res!.getData_asU8()));
+    }));
+  }
+
+  /**
    * Gets metadata about a particular blob.
    *
    * @param name
@@ -244,34 +255,54 @@ export default class DDRPDClient {
       if (err) {
         return reject(err);
       }
+      if (!res) {
+        return reject(new Error('res is undefined'));
+      }
 
       resolve({
         name,
-        publicKey: Buffer.from(res!.getPublickey_asU8()).toString('hex'),
-        timestamp: res!.getTimestamp() * 1000,
-        merkleRoot: Buffer.from(res!.getMerkleroot_asU8()).toString('hex'),
+        publicKey: Buffer.from(res.getPublickey_asU8()).toString('hex'),
+        importHeight: res.getImportheight(),
+        timestamp: res.getTimestamp() * 1000,
+        merkleRoot: Buffer.from(res.getMerkleroot_asU8()).toString('hex'),
+        reservedRoot: Buffer.from(res.getReservedroot_asU8()).toString('hex'),
+        receivedAt: res.getReceivedat() * 1000,
+        signature: Buffer.from(res.getSignature_asU8()).toString('hex'),
+        timebank: res.getTimebank(),
       });
     }));
   }
 
+  /**
+   * Streams [[BlobInfo]] for all names DDRP is aware of.
+   *
+   * @param start
+   * @param limit
+   * @param cb
+   */
   streamBlobInfo (start: string, limit: number, cb: (info: BlobInfo) => void): Promise<void> {
     return new Promise((resolve, reject) => {
-      let sent = 0;
+      let count = 0;
       const req = new ListBlobInfoReq();
       req.setStart(start);
       const stream = this.client.listBlobInfo(req);
       stream.on('data', (res: BlobInfoRes) => {
-        if (sent === limit) {
+        if (count === limit) {
           return;
         }
         cb({
           name: res.getName(),
-          publicKey: Buffer.from(res!.getPublickey_asU8()).toString('hex'),
-          timestamp: res!.getTimestamp() * 1000,
-          merkleRoot: Buffer.from(res!.getMerkleroot_asU8()).toString('hex'),
+          publicKey: Buffer.from(res.getPublickey_asU8()).toString('hex'),
+          importHeight: res.getImportheight(),
+          timestamp: res.getTimestamp() * 1000,
+          merkleRoot: Buffer.from(res.getMerkleroot_asU8()).toString('hex'),
+          reservedRoot: Buffer.from(res.getReservedroot_asU8()).toString('hex'),
+          receivedAt: res.getReceivedat() * 1000,
+          signature: Buffer.from(res.getSignature_asU8()).toString('hex'),
+          timebank: res.getTimebank(),
         });
-        sent++;
-        if (sent === limit) {
+        count++;
+        if (count === limit) {
           stream.destroy();
         }
       });
@@ -283,24 +314,22 @@ export default class DDRPDClient {
     });
   }
 
-  headerCount (): Promise<number> {
-    return new Promise((resolve, reject) => {
-      const req = new Empty();
-      this.client.countHeaders(req, (err, res) => {
-        if (err) {
-          return reject(err);
-        }
+  /**
+   * Send Update
+   */
+  sendUpdate (name: string): Promise<number> {
+    const req = new SendUpdateReq();
+    req.setName(name);
 
-        resolve(res!.getCount());
-      });
-    });
-  }
+    return new Promise((resolve, reject) => this.client.sendUpdate(req, (err, res) => {
+      if (err) {
+        return reject(err);
+      }
+      if (!res) {
+        return reject(new Error('res is undefined'));
+      }
 
-  private decodeIP (ip: Uint8Array): string {
-    if (ip.length !== 4) {
-      throw new Error('mal-formed IP');
-    }
-
-    return `${ip[0]}.${ip[1]}.${ip[2]}.${ip[3]}`;
+      resolve(res.getRecipientcount());
+    }));
   }
 }

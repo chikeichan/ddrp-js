@@ -3,7 +3,6 @@
 'use strict';
 var grpc = require('grpc');
 var api_pb = require('./api_pb.js');
-var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
 
 function serialize_AddPeerReq(arg) {
   if (!(arg instanceof api_pb.AddPeerReq)) {
@@ -93,26 +92,15 @@ function deserialize_CommitRes(buffer_arg) {
   return api_pb.CommitRes.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_CountHeadersRes(arg) {
-  if (!(arg instanceof api_pb.CountHeadersRes)) {
-    throw new Error('Expected argument of type CountHeadersRes');
+function serialize_Empty(arg) {
+  if (!(arg instanceof api_pb.Empty)) {
+    throw new Error('Expected argument of type Empty');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_CountHeadersRes(buffer_arg) {
-  return api_pb.CountHeadersRes.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_GetConfigRes(arg) {
-  if (!(arg instanceof api_pb.GetConfigRes)) {
-    throw new Error('Expected argument of type GetConfigRes');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_GetConfigRes(buffer_arg) {
-  return api_pb.GetConfigRes.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_Empty(buffer_arg) {
+  return api_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_GetStatusRes(arg) {
@@ -137,6 +125,28 @@ function deserialize_ListBlobInfoReq(buffer_arg) {
   return api_pb.ListBlobInfoReq.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_ListPeersReq(arg) {
+  if (!(arg instanceof api_pb.ListPeersReq)) {
+    throw new Error('Expected argument of type ListPeersReq');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ListPeersReq(buffer_arg) {
+  return api_pb.ListPeersReq.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_ListPeersRes(arg) {
+  if (!(arg instanceof api_pb.ListPeersRes)) {
+    throw new Error('Expected argument of type ListPeersRes');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ListPeersRes(buffer_arg) {
+  return api_pb.ListPeersRes.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_PreCommitReq(arg) {
   if (!(arg instanceof api_pb.PreCommitReq)) {
     throw new Error('Expected argument of type PreCommitReq');
@@ -159,28 +169,6 @@ function deserialize_PreCommitRes(buffer_arg) {
   return api_pb.PreCommitRes.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_QueryPeersReq(arg) {
-  if (!(arg instanceof api_pb.QueryPeersReq)) {
-    throw new Error('Expected argument of type QueryPeersReq');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_QueryPeersReq(buffer_arg) {
-  return api_pb.QueryPeersReq.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_QueryPeersRes(arg) {
-  if (!(arg instanceof api_pb.QueryPeersRes)) {
-    throw new Error('Expected argument of type QueryPeersRes');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_QueryPeersRes(buffer_arg) {
-  return api_pb.QueryPeersRes.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_ReadAtReq(arg) {
   if (!(arg instanceof api_pb.ReadAtReq)) {
     throw new Error('Expected argument of type ReadAtReq');
@@ -201,28 +189,6 @@ function serialize_ReadAtRes(arg) {
 
 function deserialize_ReadAtRes(buffer_arg) {
   return api_pb.ReadAtRes.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_ReadReq(arg) {
-  if (!(arg instanceof api_pb.ReadReq)) {
-    throw new Error('Expected argument of type ReadReq');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_ReadReq(buffer_arg) {
-  return api_pb.ReadReq.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_ReadRes(arg) {
-  if (!(arg instanceof api_pb.ReadRes)) {
-    throw new Error('Expected argument of type ReadRes');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_ReadRes(buffer_arg) {
-  return api_pb.ReadRes.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_SendUpdateReq(arg) {
@@ -280,87 +246,65 @@ function deserialize_WriteReq(buffer_arg) {
   return api_pb.WriteReq.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_google_protobuf_Empty(arg) {
-  if (!(arg instanceof google_protobuf_empty_pb.Empty)) {
-    throw new Error('Expected argument of type google.protobuf.Empty');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
 
-function deserialize_google_protobuf_Empty(buffer_arg) {
-  return google_protobuf_empty_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-
-var DDRPService = exports.DDRPService = {
+var DDRPv1Service = exports.DDRPv1Service = {
   getStatus: {
-    path: '/DDRP/GetStatus',
+    path: '/DDRPv1/GetStatus',
     requestStream: false,
     responseStream: false,
-    requestType: google_protobuf_empty_pb.Empty,
+    requestType: api_pb.Empty,
     responseType: api_pb.GetStatusRes,
-    requestSerialize: serialize_google_protobuf_Empty,
-    requestDeserialize: deserialize_google_protobuf_Empty,
+    requestSerialize: serialize_Empty,
+    requestDeserialize: deserialize_Empty,
     responseSerialize: serialize_GetStatusRes,
     responseDeserialize: deserialize_GetStatusRes,
   },
-  getConfig: {
-    path: '/DDRP/GetConfig',
-    requestStream: false,
-    responseStream: false,
-    requestType: google_protobuf_empty_pb.Empty,
-    responseType: api_pb.GetConfigRes,
-    requestSerialize: serialize_google_protobuf_Empty,
-    requestDeserialize: deserialize_google_protobuf_Empty,
-    responseSerialize: serialize_GetConfigRes,
-    responseDeserialize: deserialize_GetConfigRes,
-  },
   addPeer: {
-    path: '/DDRP/AddPeer',
+    path: '/DDRPv1/AddPeer',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.AddPeerReq,
-    responseType: google_protobuf_empty_pb.Empty,
+    responseType: api_pb.Empty,
     requestSerialize: serialize_AddPeerReq,
     requestDeserialize: deserialize_AddPeerReq,
-    responseSerialize: serialize_google_protobuf_Empty,
-    responseDeserialize: deserialize_google_protobuf_Empty,
-  },
-  unbanPeer: {
-    path: '/DDRP/UnbanPeer',
-    requestStream: false,
-    responseStream: false,
-    requestType: api_pb.UnbanPeerReq,
-    responseType: google_protobuf_empty_pb.Empty,
-    requestSerialize: serialize_UnbanPeerReq,
-    requestDeserialize: deserialize_UnbanPeerReq,
-    responseSerialize: serialize_google_protobuf_Empty,
-    responseDeserialize: deserialize_google_protobuf_Empty,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
   },
   banPeer: {
-    path: '/DDRP/BanPeer',
+    path: '/DDRPv1/BanPeer',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.BanPeerReq,
-    responseType: google_protobuf_empty_pb.Empty,
+    responseType: api_pb.Empty,
     requestSerialize: serialize_BanPeerReq,
     requestDeserialize: deserialize_BanPeerReq,
-    responseSerialize: serialize_google_protobuf_Empty,
-    responseDeserialize: deserialize_google_protobuf_Empty,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
   },
-  queryPeers: {
-    path: '/DDRP/QueryPeers',
+  unbanPeer: {
+    path: '/DDRPv1/UnbanPeer',
+    requestStream: false,
+    responseStream: false,
+    requestType: api_pb.UnbanPeerReq,
+    responseType: api_pb.Empty,
+    requestSerialize: serialize_UnbanPeerReq,
+    requestDeserialize: deserialize_UnbanPeerReq,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
+  },
+  listPeers: {
+    path: '/DDRPv1/ListPeers',
     requestStream: false,
     responseStream: true,
-    requestType: api_pb.QueryPeersReq,
-    responseType: api_pb.QueryPeersRes,
-    requestSerialize: serialize_QueryPeersReq,
-    requestDeserialize: deserialize_QueryPeersReq,
-    responseSerialize: serialize_QueryPeersRes,
-    responseDeserialize: deserialize_QueryPeersRes,
+    requestType: api_pb.ListPeersReq,
+    responseType: api_pb.ListPeersRes,
+    requestSerialize: serialize_ListPeersReq,
+    requestDeserialize: deserialize_ListPeersReq,
+    responseSerialize: serialize_ListPeersRes,
+    responseDeserialize: deserialize_ListPeersRes,
   },
   checkout: {
-    path: '/DDRP/Checkout',
+    path: '/DDRPv1/Checkout',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.CheckoutReq,
@@ -371,29 +315,29 @@ var DDRPService = exports.DDRPService = {
     responseDeserialize: deserialize_CheckoutRes,
   },
   write: {
-    path: '/DDRP/Write',
+    path: '/DDRPv1/Write',
     requestStream: true,
     responseStream: false,
     requestType: api_pb.WriteReq,
-    responseType: google_protobuf_empty_pb.Empty,
+    responseType: api_pb.Empty,
     requestSerialize: serialize_WriteReq,
     requestDeserialize: deserialize_WriteReq,
-    responseSerialize: serialize_google_protobuf_Empty,
-    responseDeserialize: deserialize_google_protobuf_Empty,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
   },
   truncate: {
-    path: '/DDRP/Truncate',
+    path: '/DDRPv1/Truncate',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.TruncateReq,
-    responseType: google_protobuf_empty_pb.Empty,
+    responseType: api_pb.Empty,
     requestSerialize: serialize_TruncateReq,
     requestDeserialize: deserialize_TruncateReq,
-    responseSerialize: serialize_google_protobuf_Empty,
-    responseDeserialize: deserialize_google_protobuf_Empty,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
   },
   preCommit: {
-    path: '/DDRP/PreCommit',
+    path: '/DDRPv1/PreCommit',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.PreCommitReq,
@@ -404,7 +348,7 @@ var DDRPService = exports.DDRPService = {
     responseDeserialize: deserialize_PreCommitRes,
   },
   commit: {
-    path: '/DDRP/Commit',
+    path: '/DDRPv1/Commit',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.CommitReq,
@@ -414,19 +358,8 @@ var DDRPService = exports.DDRPService = {
     responseSerialize: serialize_CommitRes,
     responseDeserialize: deserialize_CommitRes,
   },
-  read: {
-    path: '/DDRP/Read',
-    requestStream: false,
-    responseStream: true,
-    requestType: api_pb.ReadReq,
-    responseType: api_pb.ReadRes,
-    requestSerialize: serialize_ReadReq,
-    requestDeserialize: deserialize_ReadReq,
-    responseSerialize: serialize_ReadRes,
-    responseDeserialize: deserialize_ReadRes,
-  },
   readAt: {
-    path: '/DDRP/ReadAt',
+    path: '/DDRPv1/ReadAt',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.ReadAtReq,
@@ -437,7 +370,7 @@ var DDRPService = exports.DDRPService = {
     responseDeserialize: deserialize_ReadAtRes,
   },
   getBlobInfo: {
-    path: '/DDRP/GetBlobInfo',
+    path: '/DDRPv1/GetBlobInfo',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.BlobInfoReq,
@@ -448,7 +381,7 @@ var DDRPService = exports.DDRPService = {
     responseDeserialize: deserialize_BlobInfoRes,
   },
   listBlobInfo: {
-    path: '/DDRP/ListBlobInfo',
+    path: '/DDRPv1/ListBlobInfo',
     requestStream: false,
     responseStream: true,
     requestType: api_pb.ListBlobInfoReq,
@@ -458,19 +391,8 @@ var DDRPService = exports.DDRPService = {
     responseSerialize: serialize_BlobInfoRes,
     responseDeserialize: deserialize_BlobInfoRes,
   },
-  countHeaders: {
-    path: '/DDRP/CountHeaders',
-    requestStream: false,
-    responseStream: false,
-    requestType: google_protobuf_empty_pb.Empty,
-    responseType: api_pb.CountHeadersRes,
-    requestSerialize: serialize_google_protobuf_Empty,
-    requestDeserialize: deserialize_google_protobuf_Empty,
-    responseSerialize: serialize_CountHeadersRes,
-    responseDeserialize: deserialize_CountHeadersRes,
-  },
   sendUpdate: {
-    path: '/DDRP/SendUpdate',
+    path: '/DDRPv1/SendUpdate',
     requestStream: false,
     responseStream: false,
     requestType: api_pb.SendUpdateReq,
@@ -482,4 +404,4 @@ var DDRPService = exports.DDRPService = {
   },
 };
 
-exports.DDRPClient = grpc.makeGenericClientConstructor(DDRPService);
+exports.DDRPv1Client = grpc.makeGenericClientConstructor(DDRPv1Service);

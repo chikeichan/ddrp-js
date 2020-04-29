@@ -57,7 +57,11 @@ describe('iterateAllEnvelopes', () => {
         return false;
       }
       envelopes.push(envelope);
-      return envelopes.length < 1;
+      const shouldContinue = envelopes.length < 1;
+      if (!shouldContinue) {
+        resolve();
+      }
+      return shouldContinue;
     }));
 
     assert.equal(envelopes.length, 1);
