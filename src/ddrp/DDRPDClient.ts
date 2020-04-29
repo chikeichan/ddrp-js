@@ -48,13 +48,13 @@ export default class DDRPDClient {
         return reject(new Error('res is undefined'));
       }
 
-      return {
+      resolve({
         peerId: Buffer.from(res.getPeerid_asU8()).toString('hex'),
         peerCount: res.getPeercount(),
         headerCount: res.getHeadercount(),
         txBytes: res.getTxbytes(),
         rxBytes: res.getRxbytes(),
-      };
+      });
     }));
   }
 
