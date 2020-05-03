@@ -24,6 +24,16 @@ export function decodeUint64 (r: Reader, cb: (err: any, n: Long | null) => void)
   });
 }
 
+export function decodeUint32(r: Reader, cb: (err: any, n: number|null) => void): void {
+  const buf = Buffer.alloc(4);
+  r.read(buf, (err, _) => {
+    if (err) {
+      return cb(err, null);
+    }
+    cb(null, buf.readUInt32BE(0));
+  });
+}
+
 export function decodeUvarint (r: Reader, cb: (err: any, n: Long | null) => void): void {
   const buf = Buffer.alloc(1);
   let result = Long.ZERO;
@@ -80,14 +90,11 @@ export function decodeString (r: Reader, cb: (err: any, s: string | null) => voi
 }
 
 export function decodeTimestamp (r: Reader, cb: (err: any, date: Date | null) => void): void {
-  decodeUint64(r, (err, n) => {
+  decodeUint32(r, (err, n) => {
     if (err) {
       return cb(err, null);
     }
-    if (n!.mul(1000).gt(Number.MAX_SAFE_INTEGER)) {
-      return cb(new Error('timestamp too large'), null);
-    }
-    cb(null, new Date(n!.toNumber() * 1000));
+    cb(null, new Date(n! * 1000));
   });
 }
 

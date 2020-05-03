@@ -39,6 +39,24 @@ export function encodeUint64Sync (n: number): Buffer {
   ]);
 }
 
+export function encodeUint32 (w: Writer, n: number, cb: IOCallback): void {
+  if (n < 0) {
+    throw new Error('number is not a uint32');
+  }
+  const numBytes = Buffer.alloc(4);
+  numBytes.writeUInt32BE(n, 0);
+  w.write(numBytes, cb);
+}
+
+export function encodeUint32Sync (n: number): Buffer {
+  if (n < 0) {
+    throw new Error('number is not a uint32');
+  }
+  const numBytes = Buffer.alloc(4);
+  numBytes.writeUInt32BE(n, 0);
+  return numBytes;
+}
+
 export function encodeUvarint (w: Writer, n: number, cb: IOCallback): void {
   w.write(encodeUvarintSync(n), cb);
 }
@@ -84,11 +102,11 @@ export function encodeStringSync (str: string): Buffer {
 }
 
 export function encodeTimestamp (w: Writer, date: Date, cb: IOCallback): void {
-  encodeUint64(w, date.getTime() / 1000, cb);
+  encodeUint32(w, date.getTime() / 1000, cb);
 }
 
 export function encodeTimestampSync (date: Date): Buffer {
-  return encodeUint64Sync(date.getTime() / 1000);
+  return encodeUint32Sync(date.getTime() / 1000);
 }
 
 export function encodeArray<T> (w: Writer, itemWriter: (item: T, cb: IOCallback) => void, items: T[], cb: IOCallback): void {

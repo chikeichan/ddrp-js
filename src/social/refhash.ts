@@ -1,6 +1,6 @@
 import {encodeEnvelopeMessage, Envelope} from './Envelope';
 import blake2b from 'blake2b';
-import {encodeTimestampSync, encodeUint8Sync} from '../io/encoding';
+import {encodeTimestampSync, encodeUint32Sync, encodeUint8Sync} from '../io/encoding';
 import {MutableBuffer} from '../io/MutableBuffer';
 import {ZERO_BUFFER} from '../io/util';
 
@@ -9,8 +9,8 @@ export async function createRefhash (envelope: Envelope, subdomain: string, tld:
   h.update(envelope.message.type);
   h.update(encodeUint8Sync(envelope.message.version));
   h.update(envelope.message.subtype);
+  h.update(encodeUint32Sync(envelope.id));
   h.update(encodeTimestampSync(envelope.timestamp));
-  h.update(Buffer.from(envelope.guid, 'hex'));
   const msgBuf = new MutableBuffer();
   await new Promise((resolve, reject) => encodeEnvelopeMessage(msgBuf, envelope, (err, _) => {
     if (err) {

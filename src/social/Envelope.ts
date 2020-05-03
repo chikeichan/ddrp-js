@@ -1,5 +1,5 @@
 import {IOCallback, Reader, Writer} from '../io/types';
-import {decodeFixedBytes, decodeTimestamp, decodeUint8, decodeVariableBytes} from '../io/decoding';
+import {decodeFixedBytes, decodeTimestamp, decodeUint32, decodeUint8, decodeVariableBytes} from '../io/decoding';
 import {chain, chainIO, readAll, ZERO_BUFFER} from '../io/util';
 import {BufferView} from '../io/BufferView';
 import {Message} from './Message';
@@ -8,27 +8,27 @@ import {Connection, decodeConnection, encodeConnection} from './Connection';
 import {decodeModeration, encodeModeration, Moderation} from './Moderation';
 import {decodeUnknown, encodeUnknown, Unknown} from './Unknown';
 import {MutableBuffer} from '../io/MutableBuffer';
-import {encodeFixedBytes, encodeTimestamp, encodeUint8, encodeVariableBytes} from '../io/encoding';
+import {encodeFixedBytes, encodeTimestamp, encodeUint32, encodeUint8, encodeVariableBytes} from '../io/encoding';
 
 export class Envelope {
+  public id: number;
+
   public nameIndex: number;
 
   public timestamp: Date;
 
-  public guid: string;
+  public signature: Buffer | null;
 
   public message: Message;
 
-  public signature: Buffer | null;
-
   public additionalData: Buffer | null;
 
-  constructor (nameIndex: number, timestamp: Date, guid: string, message: Message, signature: Buffer | null, additionalData: Buffer | null) {
+  constructor (id: number, nameIndex: number, timestamp: Date, signature: Buffer | null, message: Message, additionalData: Buffer | null) {
+    this.id = id;
     this.nameIndex = nameIndex;
     this.timestamp = timestamp;
-    this.guid = guid;
-    this.message = message;
     this.signature = signature;
+    this.message = message;
     this.additionalData = additionalData;
   }
 }
@@ -41,10 +41,6 @@ export class Envelope {
  * @param cb
  */
 export function encodeEnvelope (w: Writer, envelope: Envelope, cb: IOCallback) {
-  const guidBuf = Buffer.from(envelope.guid, 'hex');
-  if (guidBuf.length != 8) {
-    throw new Error('guid must be 8 bytes long');
-  }
   if (envelope.message.type.length !== 3) {
     throw new Error('message type must be 3 bytes long');
   }
@@ -63,13 +59,13 @@ export function encodeEnvelope (w: Writer, envelope: Envelope, cb: IOCallback) {
       }
       encodeVariableBytes(w, buf.bytes(), cb);
     },
-    (cb) => encodeVariableBytes(buf, envelope.signature || ZERO_BUFFER, cb),
     (cb) => encodeFixedBytes(buf, envelope.message.type, cb),
     (cb) => encodeUint8(buf, envelope.message.version, cb),
     (cb) => encodeFixedBytes(buf, envelope.message.subtype, cb),
+    (cb) => encodeUint32(buf, envelope.id, cb),
     (cb) => encodeUint8(buf, envelope.nameIndex, cb),
     (cb) => encodeTimestamp(buf, envelope.timestamp, cb),
-    (cb) => encodeFixedBytes(buf, guidBuf, cb),
+    (cb) => encodeVariableBytes(buf, envelope.signature || ZERO_BUFFER, cb),
     (cb) => encodeEnvelopeMessage(buf, envelope, cb),
     (cb) => encodeFixedBytes(buf, envelope.additionalData || ZERO_BUFFER, cb),
   );
@@ -136,7 +132,7 @@ export function decodeEnvelopeBuffer (r: Reader, cb: (err: any, envelope: Envelo
   let msgSubtype: Buffer;
   let nameIndex: number;
   let timestamp: Date;
-  let guid: string;
+  let id: number;
   let message: Message;
   let aData: Buffer;
   chain(
@@ -145,21 +141,14 @@ export function decodeEnvelopeBuffer (r: Reader, cb: (err: any, envelope: Envelo
         return cb(err, null);
       }
       cb(null, new Envelope(
+        id,
         nameIndex,
         timestamp,
-        guid,
-        message,
         sig,
+        message,
         aData,
       ));
     },
-    (cb) => decodeVariableBytes(r, (err, b) => {
-      if (err) {
-        return cb(err);
-      }
-      sig = b!;
-      cb(null);
-    }),
     (cb) => decodeFixedBytes(r, 3, (err, b) => {
       if (err) {
         return cb(err);
@@ -181,6 +170,13 @@ export function decodeEnvelopeBuffer (r: Reader, cb: (err: any, envelope: Envelo
       msgSubtype = b!;
       cb(null);
     }),
+    (cb) => decodeUint32(r, (err, n) => {
+      if (err) {
+        return cb(err);
+      }
+      id = n!;
+      cb(null);
+    }),
     (cb) => decodeUint8(r, (err, n) => {
       if (err) {
         return cb(err);
@@ -195,11 +191,11 @@ export function decodeEnvelopeBuffer (r: Reader, cb: (err: any, envelope: Envelo
       timestamp = ts!;
       cb(null);
     }),
-    (cb) => decodeFixedBytes(r, 8, (err, b) => {
+    (cb) => decodeVariableBytes(r, (err, b) => {
       if (err) {
         return cb(err);
       }
-      guid = b!.toString('hex');
+      sig = b!;
       cb(null);
     }),
     (cb) => {
