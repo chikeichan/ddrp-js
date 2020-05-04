@@ -70,7 +70,7 @@ export function isSubdomainBlob (r: Reader, cb: (err: any, res: boolean | null) 
     if (err) {
       return cb(err, null);
     }
-    return buf!.toString('utf-8') === SUBDOMAIN_MAGIC;
+    cb(null, buf!.toString('utf-8') === SUBDOMAIN_MAGIC);
   });
 }
 
