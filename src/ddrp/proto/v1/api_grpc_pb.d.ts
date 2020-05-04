@@ -13,7 +13,7 @@ interface IDDRPv1Service extends grpc.ServiceDefinition<grpc.UntypedServiceImple
   unbanPeer: grpc.MethodDefinition<api_pb.UnbanPeerReq, api_pb.Empty>;
   listPeers: grpc.MethodDefinition<api_pb.ListPeersReq, api_pb.ListPeersRes>;
   checkout: grpc.MethodDefinition<api_pb.CheckoutReq, api_pb.CheckoutRes>;
-  write: grpc.MethodDefinition<api_pb.WriteReq, api_pb.Empty>;
+  writeAt: grpc.MethodDefinition<api_pb.WriteAtReq, api_pb.WriteAtRes>;
   truncate: grpc.MethodDefinition<api_pb.TruncateReq, api_pb.Empty>;
   preCommit: grpc.MethodDefinition<api_pb.PreCommitReq, api_pb.PreCommitRes>;
   commit: grpc.MethodDefinition<api_pb.CommitReq, api_pb.CommitRes>;
@@ -44,9 +44,9 @@ export class DDRPv1Client extends grpc.Client {
   checkout(argument: api_pb.CheckoutReq, callback: grpc.requestCallback<api_pb.CheckoutRes>): grpc.ClientUnaryCall;
   checkout(argument: api_pb.CheckoutReq, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<api_pb.CheckoutRes>): grpc.ClientUnaryCall;
   checkout(argument: api_pb.CheckoutReq, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<api_pb.CheckoutRes>): grpc.ClientUnaryCall;
-  write(callback: grpc.requestCallback<api_pb.Empty>): grpc.ClientWritableStream<api_pb.WriteReq>;
-  write(metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<api_pb.Empty>): grpc.ClientWritableStream<api_pb.WriteReq>;
-  write(metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<api_pb.Empty>): grpc.ClientWritableStream<api_pb.WriteReq>;
+  writeAt(argument: api_pb.WriteAtReq, callback: grpc.requestCallback<api_pb.WriteAtRes>): grpc.ClientUnaryCall;
+  writeAt(argument: api_pb.WriteAtReq, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<api_pb.WriteAtRes>): grpc.ClientUnaryCall;
+  writeAt(argument: api_pb.WriteAtReq, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<api_pb.WriteAtRes>): grpc.ClientUnaryCall;
   truncate(argument: api_pb.TruncateReq, callback: grpc.requestCallback<api_pb.Empty>): grpc.ClientUnaryCall;
   truncate(argument: api_pb.TruncateReq, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<api_pb.Empty>): grpc.ClientUnaryCall;
   truncate(argument: api_pb.TruncateReq, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<api_pb.Empty>): grpc.ClientUnaryCall;

@@ -235,15 +235,26 @@ function deserialize_UnbanPeerReq(buffer_arg) {
   return api_pb.UnbanPeerReq.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_WriteReq(arg) {
-  if (!(arg instanceof api_pb.WriteReq)) {
-    throw new Error('Expected argument of type WriteReq');
+function serialize_WriteAtReq(arg) {
+  if (!(arg instanceof api_pb.WriteAtReq)) {
+    throw new Error('Expected argument of type WriteAtReq');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_WriteReq(buffer_arg) {
-  return api_pb.WriteReq.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_WriteAtReq(buffer_arg) {
+  return api_pb.WriteAtReq.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_WriteAtRes(arg) {
+  if (!(arg instanceof api_pb.WriteAtRes)) {
+    throw new Error('Expected argument of type WriteAtRes');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_WriteAtRes(buffer_arg) {
+  return api_pb.WriteAtRes.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 
@@ -314,16 +325,16 @@ var DDRPv1Service = exports.DDRPv1Service = {
     responseSerialize: serialize_CheckoutRes,
     responseDeserialize: deserialize_CheckoutRes,
   },
-  write: {
-    path: '/DDRPv1/Write',
-    requestStream: true,
+  writeAt: {
+    path: '/DDRPv1/WriteAt',
+    requestStream: false,
     responseStream: false,
-    requestType: api_pb.WriteReq,
-    responseType: api_pb.Empty,
-    requestSerialize: serialize_WriteReq,
-    requestDeserialize: deserialize_WriteReq,
-    responseSerialize: serialize_Empty,
-    responseDeserialize: deserialize_Empty,
+    requestType: api_pb.WriteAtReq,
+    responseType: api_pb.WriteAtRes,
+    requestSerialize: serialize_WriteAtReq,
+    requestDeserialize: deserialize_WriteAtReq,
+    responseSerialize: serialize_WriteAtRes,
+    responseDeserialize: deserialize_WriteAtRes,
   },
   truncate: {
     path: '/DDRPv1/Truncate',

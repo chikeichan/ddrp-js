@@ -279,7 +279,7 @@ export namespace CheckoutRes {
   }
 }
 
-export class WriteReq extends jspb.Message {
+export class WriteAtReq extends jspb.Message {
   getTxid(): number;
   setTxid(value: number): void;
 
@@ -292,20 +292,44 @@ export class WriteReq extends jspb.Message {
   setData(value: Uint8Array | string): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): WriteReq.AsObject;
-  static toObject(includeInstance: boolean, msg: WriteReq): WriteReq.AsObject;
+  toObject(includeInstance?: boolean): WriteAtReq.AsObject;
+  static toObject(includeInstance: boolean, msg: WriteAtReq): WriteAtReq.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: WriteReq, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): WriteReq;
-  static deserializeBinaryFromReader(message: WriteReq, reader: jspb.BinaryReader): WriteReq;
+  static serializeBinaryToWriter(message: WriteAtReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WriteAtReq;
+  static deserializeBinaryFromReader(message: WriteAtReq, reader: jspb.BinaryReader): WriteAtReq;
 }
 
-export namespace WriteReq {
+export namespace WriteAtReq {
   export type AsObject = {
     txid: number,
     offset: number,
     data: Uint8Array | string,
+  }
+}
+
+export class WriteAtRes extends jspb.Message {
+  getByteswritten(): number;
+  setByteswritten(value: number): void;
+
+  getWriteerr(): string;
+  setWriteerr(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): WriteAtRes.AsObject;
+  static toObject(includeInstance: boolean, msg: WriteAtRes): WriteAtRes.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: WriteAtRes, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WriteAtRes;
+  static deserializeBinaryFromReader(message: WriteAtRes, reader: jspb.BinaryReader): WriteAtRes;
+}
+
+export namespace WriteAtRes {
+  export type AsObject = {
+    byteswritten: number,
+    writeerr: string,
   }
 }
 

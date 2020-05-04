@@ -18,7 +18,6 @@ export function sealHash (name: string, timestamp: Date, merkleRoot: Buffer): Bu
   timeBuf.writeUInt32BE(Math.floor(timestamp.getTime() / 1000), 0);
   h.update(Buffer.from('DDRPBLOB', 'ascii'));
   h.update(nameBuf);
-  h.update(Buffer.alloc(4));
   h.update(timeBuf);
   h.update(merkleRoot);
   // include zero reservedRoot

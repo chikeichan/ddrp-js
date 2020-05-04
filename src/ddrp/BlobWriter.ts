@@ -1,6 +1,5 @@
-import {WriteReq} from './proto/v1/api_pb';
-import * as grpc from 'grpc';
 import {IOCallback, Writer} from '../io/types';
+import DDRPDClient from './DDRPDClient';
 
 /**
  * A [[Writer]] that writes data to a DDRP blob via gRPC.
@@ -9,7 +8,7 @@ import {IOCallback, Writer} from '../io/types';
  * be committed separately.
  */
 export default class BlobWriter implements Writer {
-  private readonly client: grpc.ClientWritableStream<WriteReq>;
+  private readonly client: DDRPDClient;
 
   private readonly txId: number;
 
@@ -22,27 +21,19 @@ export default class BlobWriter implements Writer {
    * @param txId - The transaction ID of the blob being modified. Returned by [[DDRPDClient.checkout]].
    * @param offset - The offset to start writing at.
    */
-  constructor (client: grpc.ClientWritableStream<WriteReq>, txId: number, offset = 0) {
+  constructor (client: DDRPDClient, txId: number, offset = 0) {
     this.client = client;
     this.txId = txId;
     this.offset = offset;
   }
 
   write (buf: Buffer, cb: IOCallback): void {
-    const req = new WriteReq();
-    req.setTxid(this.txId);
-    req.setOffset(this.offset);
-    req.setData(buf);
-    this.client.write(req, (err: Error) => {
-      this.offset += buf.length;
-      cb(err, err ? buf.length : 0);
-    });
-  }
-
-  /**
-   * Closes the writer, ending the underlying gRPC stream.
-   */
-  close (): void {
-    this.client.end();
+    this.client.writeAt(this.txId, this.offset, buf)
+      .then((res) => {
+        const bytesWritten = res.getByteswritten();
+        const writeErr = res.getWriteerr();
+        this.offset += bytesWritten;
+        cb(writeErr ? new Error(`Error while writing: ${writeErr}`) : null, bytesWritten);
+      }, (err) => cb(err, 0));
   }
 }

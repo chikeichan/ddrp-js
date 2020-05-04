@@ -27,12 +27,13 @@ describe('EnvelopeWriter', () => {
     const follow = await pDecodeEnvelope(new BufferView(followBuf));
     const client = new DDRPDClient(process.env.DDRP_URL!);
     const signer = SECP256k1Signer.fromHexPrivateKey(process.env.TEST_PRIVATE_KEY!);
-    const writer = new EnvelopeWriter(client, process.env.TEST_TLD!, true, signer);
+    const writer = new EnvelopeWriter(client, process.env.TEST_TLD!, signer);
     await writer.open();
+    await writer.truncate();
     await writer.writeEnvelope(post!);
     await writer.writeEnvelope(like!);
     await writer.writeEnvelope(follow!);
-    await writer.commit();
+    await writer.commit(false);
 
     const r = new BlobReader(process.env.TEST_TLD!, client);
     const h = crypto.createHash('sha1');
@@ -43,6 +44,6 @@ describe('EnvelopeWriter', () => {
       h.update(data!);
       resolve();
     }));
-    assert.equal(h.digest('hex'), '0da1dfe2bd6d8b80662e92918e3332017eab1a8b');
+    assert.equal(h.digest('hex'), 'fa11b3ea22008ab21e965b21f0ef7af4ee77198c');
   }).timeout(10000);
 });

@@ -16,8 +16,6 @@ export class EnvelopeWriter {
 
   private readonly tld: string;
 
-  private readonly truncate: boolean;
-
   private readonly signer: Signer;
 
   private readonly startOffset: number;
@@ -33,14 +31,12 @@ export class EnvelopeWriter {
    *
    * @param client
    * @param tld - The TLD to be written to.
-   * @param truncate - Whether or not to zero out the blob prior to writing.
    * @param signer - A Signer instance to sign the blob's new Merkle root.
    * @param startOffset - The offset at which to start writing.
    */
-  constructor (client: DDRPDClient, tld: string, truncate: boolean, signer: Signer, startOffset: number = 0) {
+  constructor (client: DDRPDClient, tld: string, signer: Signer, startOffset: number = 0) {
     this.client = client;
     this.tld = tld;
-    this.truncate = truncate;
     this.signer = signer;
     this.startOffset = startOffset;
   }
@@ -53,11 +49,21 @@ export class EnvelopeWriter {
       throw new Error('already opened');
     }
     const txId = await this.client.checkout(this.tld);
-    if (this.truncate) {
-      await this.client.truncate(txId);
-    }
     this.txId = txId;
-    this.writer = new BlobWriter(this.client.createWriteStream(), txId, this.startOffset);
+    this.writer = new BlobWriter(this.client, txId, this.startOffset);
+  }
+
+  /**
+   * Truncates the blob.
+   */
+  public async truncate (): Promise<void> {
+    if (!this.writer) {
+      throw new Error('not open');
+    }
+    if (this.committed) {
+      throw new Error('already committed');
+    }
+    await this.client.truncate(this.txId);
   }
 
   /**
@@ -101,6 +107,5 @@ export class EnvelopeWriter {
     const sig = sealAndSign(this.signer, this.tld, date, merkleRoot);
     await this.client.commit(this.txId, date, sig, broadcast);
     this.committed = true;
-    this.writer.close();
   }
 }

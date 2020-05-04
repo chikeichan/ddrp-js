@@ -16,7 +16,8 @@ import {
   SendUpdateReq,
   TruncateReq,
   UnbanPeerReq,
-  WriteReq
+  WriteAtReq,
+  WriteAtRes,
 } from './proto/v1/api_pb';
 import {Peer} from './Peer';
 import {BlobInfo} from './BlobInfo';
@@ -152,14 +153,24 @@ export default class DDRPDClient {
   }
 
   /**
-   * Opens a write stream suitable for writing DDRP blobs.
+   * Writes data to a blob at the given offset.
    *
-   * You'll probably want to wrap this in a [[BlobWriter]].
-   * Note that writing to blobs requires them to be checked out
-   * using the [[checkout]] method below.
+   * @param txId - The transaction ID of the blob being modified.
+   * @param offset - The offset.
+   * @param buf - The data.
    */
-  createWriteStream (): grpc.ClientWritableStream<WriteReq> {
-    return this.client.write(() => ({}));
+  writeAt (txId: number, offset: number, buf: Buffer): Promise<WriteAtRes> {
+    const req = new WriteAtReq();
+    req.setTxid(txId);
+    req.setOffset(offset);
+    req.setData(buf);
+    return new Promise((resolve, reject) => this.client.writeAt(req, (err, res) => {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve(res);
+    }));
   }
 
   /**
