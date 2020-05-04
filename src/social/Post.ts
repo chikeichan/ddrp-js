@@ -62,7 +62,7 @@ export function decodePost (r: Reader, version: number, subtype: Buffer, cb: (er
   chain(
     (err) => {
       if (err) {
-        cb(err, null);
+        return cb(err, null);
       }
       cb(null, new Post(
         version,
