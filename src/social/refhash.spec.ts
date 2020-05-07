@@ -10,35 +10,35 @@ describe('refhash', () => {
     const inputs: { file: string, hash: string }[] = [
       {
         file: 'post.bin',
-        hash: 'c9ef8d7e86c6a56565a5ce99e0239afc3ce361a274c85bb60d7aa5bbb01fa21e',
+        hash: 'f2ec968746d980500ad2f0c43d8c330cc24658401b6ffeead7c6c5e59fda8f0b',
       },
       {
         file: 'post-adata.bin',
-        hash: 'a2c5f25ffcb2f8bbf408a9d2245ef436773a0625e61226ee0b7ee23e936cc393',
+        hash: '097880388f0d58d907464960482439270c98a77bad97afd83f4ca3fc37aef231',
       },
       {
         file: 'follow.bin',
-        hash: '2268b954a249277e4271349a9998ffd1b1ad41d6d50ad31d909bdae2830f094a',
+        hash: '64d4cae5bc504e0e107ce385980e3e2f3ebb38096278793b42f06ebf0d8b5191',
       },
       {
         file: 'block.bin',
-        hash: '9ba13cd09edc64eb57004ff2597c465cfe8071f25e1d20880605f9834684f331',
+        hash: '23f7592584e1b5abd103be21c8f7dc8623bda017df55df968d2d657dfa900c4c',
       },
       {
         file: 'media.bin',
-        hash: '3fefbcf936e50e6b8ed04df992c527767e40f134df7f59054169a4cde57b82f7',
+        hash: 'ae4902f8d37ddc3182ae0334db25d56a5e0fd379a8a0a46d39453c506920509d',
       },
       {
         file: 'like.bin',
-        hash: '5d910b4db3907be959f057455c5bba1c7189ee09dfae42aa762977311477df45',
+        hash: '7dde58287dc6dab083e7b4c9c2f3805af6091a5b27d95729deb250052e5d5592',
       },
       {
         file: 'pin.bin',
-        hash: 'f8cd246a34e9f77d66ccbf4299683dd1da00e37a7cf053ffad0a65f3397e6521',
+        hash: '26efb701890851cc70f76c12367f1c7710f69b6d1967e9647ba08bee8c24b689',
       },
       {
         file: 'unknown.bin',
-        hash: '626bf47ffde1333cb2f34cf8f7a2bb700cd730dc91ba839eb0a6fd19b240266b',
+        hash: 'a1e6925bac78e22d15f7fe7ce7372cc3ae1e67733cea5ebc8f7b0c85755aff57',
       },
     ];
     const pDecodeEnvelope = promisify(decodeEnvelope);

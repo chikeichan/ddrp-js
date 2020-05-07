@@ -1,5 +1,5 @@
 import {IOCallback, Reader, Writer} from '../io/types';
-import {decodeFixedBytes, decodeTimestamp, decodeUint32, decodeUint8, decodeVariableBytes} from '../io/decoding';
+import {decodeFixedBytes, decodeTimestamp, decodeUint8, decodeVariableBytes} from '../io/decoding';
 import {chain, chainIO, readAll, ZERO_BUFFER} from '../io/util';
 import {BufferView} from '../io/BufferView';
 import {Message} from './Message';
@@ -8,11 +8,13 @@ import {Connection, decodeConnection, encodeConnection} from './Connection';
 import {decodeModeration, encodeModeration, Moderation} from './Moderation';
 import {decodeUnknown, encodeUnknown, Unknown} from './Unknown';
 import {MutableBuffer} from '../io/MutableBuffer';
-import {encodeFixedBytes, encodeTimestamp, encodeUint32, encodeUint8, encodeVariableBytes} from '../io/encoding';
+import {encodeFixedBytes, encodeTimestamp, encodeUint8, encodeVariableBytes} from '../io/encoding';
 import {decodeMedia, encodeMedia, Media} from './Media';
 
+const ID_REGEX = /([a-f0-9]{16})/;
+
 export class Envelope {
-  public id: number;
+  public id: string;
 
   public nameIndex: number;
 
@@ -24,7 +26,10 @@ export class Envelope {
 
   public additionalData: Buffer | null;
 
-  constructor (id: number, nameIndex: number, timestamp: Date, signature: Buffer | null, message: Message, additionalData: Buffer | null) {
+  constructor (id: string, nameIndex: number, timestamp: Date, signature: Buffer | null, message: Message, additionalData: Buffer | null) {
+    if (!id.match(ID_REGEX)) {
+      throw new Error('envelope IDs must be 16 hex characters')
+    }
     this.id = id;
     this.nameIndex = nameIndex;
     this.timestamp = timestamp;
@@ -63,7 +68,7 @@ export function encodeEnvelope (w: Writer, envelope: Envelope, cb: IOCallback) {
     (cb) => encodeFixedBytes(buf, envelope.message.type, cb),
     (cb) => encodeUint8(buf, envelope.message.version, cb),
     (cb) => encodeFixedBytes(buf, envelope.message.subtype, cb),
-    (cb) => encodeUint32(buf, envelope.id, cb),
+    (cb) => encodeFixedBytes(buf, Buffer.from(envelope.id, 'hex'), cb),
     (cb) => encodeUint8(buf, envelope.nameIndex, cb),
     (cb) => encodeTimestamp(buf, envelope.timestamp, cb),
     (cb) => encodeVariableBytes(buf, envelope.signature || ZERO_BUFFER, cb),
@@ -136,7 +141,7 @@ export function decodeEnvelopeBuffer (r: Reader, cb: (err: any, envelope: Envelo
   let msgSubtype: Buffer;
   let nameIndex: number;
   let timestamp: Date;
-  let id: number;
+  let id: string;
   let message: Message;
   let aData: Buffer;
   chain(
@@ -174,11 +179,11 @@ export function decodeEnvelopeBuffer (r: Reader, cb: (err: any, envelope: Envelo
       msgSubtype = b!;
       cb(null);
     }),
-    (cb) => decodeUint32(r, (err, n) => {
+    (cb) => decodeFixedBytes(r, 8, (err, buf) => {
       if (err) {
         return cb(err);
       }
-      id = n!;
+      id = buf!.toString('hex');
       cb(null);
     }),
     (cb) => decodeUint8(r, (err, n) => {
