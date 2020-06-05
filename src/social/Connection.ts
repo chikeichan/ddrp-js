@@ -53,8 +53,8 @@ export class Connection extends Message {
 export function encodeConnection (w: Writer, connection: Connection, cb: IOCallback) {
   chainIO(
     cb,
-    (cb) => encodeString(w, connection.tld, cb),
     (cb) => encodeString(w, connection.subdomain || '', cb),
+    (cb) => encodeString(w, connection.tld, cb),
   );
 }
 
@@ -85,15 +85,16 @@ export function decodeConnection (r: Reader, version: number, subtype: Buffer, c
       if (err) {
         return cb(err);
       }
-      tld = s!;
+      subdomain = s!.length > 0 ? s! : null;
       cb(null);
     }),
     (cb) => decodeString(r, (err, s) => {
       if (err) {
         return cb(err);
       }
-      subdomain = s!.length > 0 ? s! : null;
+      tld = s!;
       cb(null);
-    })
+    }),
+
   );
 }
